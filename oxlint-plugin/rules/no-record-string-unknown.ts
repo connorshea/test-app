@@ -1,5 +1,7 @@
+import { defineRule } from "@oxlint/plugins";
+
 /** Disallow `Record<string, unknown>` — declare an explicit shape instead. */
-export const noRecordStringUnknown = {
+export const noRecordStringUnknown = defineRule({
   meta: {
     type: "suggestion",
     docs: {
@@ -13,9 +15,8 @@ export const noRecordStringUnknown = {
   create(context) {
     return {
       TSTypeReference(node) {
-        if (node.typeName.type !== "Identifier" || node.typeName.name !== "Record") {
-          return;
-        }
+        if (node.typeName.type !== "Identifier" || node.typeName.name !== "Record") return;
+
         const params = node.typeArguments?.params;
         if (params?.length !== 2) return;
         if (params[0].type === "TSStringKeyword" && params[1].type === "TSUnknownKeyword") {
@@ -24,4 +25,4 @@ export const noRecordStringUnknown = {
       },
     };
   },
-};
+});

@@ -7,7 +7,7 @@ export default defineConfig({
   lint: {
     jsPlugins: [
       { name: "vite-plus", specifier: "vite-plus/oxlint-plugin" },
-      { name: "test-app", specifier: "./oxlint-plugin/index.js" },
+      { name: "test-app", specifier: "./oxlint-plugin/index.ts" },
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",

@@ -1,10 +1,15 @@
+import { defineRule, type ESTree, type Node } from "@oxlint/plugins";
+
+/** `["error", { types: ["Foo"] }]` — only the options object reaches the rule. */
+type Options = [{ types?: string[] }?];
+
 /**
  * Require a type argument on the configured types, so `Foo` is banned but
  * `Foo<T>` is allowed. Configure with:
  *
  *   "test-app/require-type-argument": ["error", { "types": ["Foo"] }]
  */
-export const requireTypeArgument = {
+export const requireTypeArgument = defineRule({
   meta: {
     type: "suggestion",
     docs: {
@@ -28,19 +33,20 @@ export const requireTypeArgument = {
     },
   },
   create(context) {
-    const types = new Set(context.options[0]?.types ?? []);
+    const [options] = context.options as Options;
+    const types = new Set(options?.types ?? []);
     if (types.size === 0) return {};
 
     /** `type X = Foo`, `class X implements Foo`, and `interface X extends Foo`. */
-    function check(node, typeName) {
-      if (typeName?.type !== "Identifier" || !types.has(typeName.name)) return;
+    function check(node: Node & { typeArguments?: unknown }, typeName: ESTree.Node) {
+      if (typeName.type !== "Identifier") return;
+
+      const { name } = typeName;
+      if (!types.has(name)) return;
       // A present-but-empty `Foo<>` is a syntax error, so existence is enough.
       if (node.typeArguments) return;
-      context.report({
-        node,
-        messageId: "requireTypeArgument",
-        data: { name: typeName.name },
-      });
+
+      context.report({ node, messageId: "requireTypeArgument", data: { name } });
     }
 
     return {
@@ -55,4 +61,4 @@ export const requireTypeArgument = {
       },
     };
   },
-};
+});
