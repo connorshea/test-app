@@ -11,7 +11,9 @@ export default defineConfig({
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
+      "test-app/no-json-clone": "error",
       "test-app/no-record-string-unknown": "error",
+      "test-app/no-regex-in-loop": "error",
       "test-app/require-type-argument": ["error", { types: ["Foo"] }],
     },
     options: { typeAware: true, typeCheck: true },
